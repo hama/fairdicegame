@@ -9,6 +9,21 @@
 using namespace eosio;
 using namespace std;
 
+string uint64_string(uint64_t input) {
+    string result;
+    uint8_t base = 10;
+    do {
+        char c = input % base;
+        input /= base;
+        if (c < 10)
+            c += '0';
+        else
+            c += 'A' - 10;
+        result = c + result;
+    } while (input);
+    return result;
+}
+
 uint8_t from_hex(char c) {
     if (c >= '0' && c <= '9') return c - '0';
     if (c >= 'a' && c <= 'f') return c - 'a' + 10;

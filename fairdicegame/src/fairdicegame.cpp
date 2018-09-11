@@ -12,7 +12,7 @@ void fairdicegame::reveal(uint64_t id, checksum256 seed) {
         action(permission_level{_self, N(active)},
                N(eosio.token),
                N(transfer),
-               make_tuple(_self, bet.player, payout, string("")))
+               make_tuple(_self, bet.player, payout, winner_memo(bet)))
             .send();
     }
     unlock(bet.amount);
@@ -22,7 +22,7 @@ void fairdicegame::reveal(uint64_t id, checksum256 seed) {
             N(eosio.token),
             N(transfer),
             make_tuple(
-                _self, bet.referrer, comput_referrer_reward(bet), string("")))
+                _self, bet.referrer, comput_referrer_reward(bet), referrer_memo(bet)))
             .send();
     }
     remove(bet);
@@ -108,7 +108,7 @@ void fairdicegame::offer(account_name from,
 
     eosio_assert(referrer != from, "referrer can not be self");
 
-    st_bet _bet{.id = _bets.available_primary_key(),
+    st_bet _bet{.id = next_id(),
                 .player = from,
                 .referrer = referrer,
                 .amount = quantity,

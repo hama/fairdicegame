@@ -7,7 +7,8 @@ class fairdicegame : public contract {
         : contract(self),
           _bets(_self, _self),
           _fund_pool(_self, _self),
-          _hash(_self, _self){};
+          _hash(_self, _self),
+          _global(_self, _self){};
 
     void offer(account_name from, account_name to, asset quantity, string memo);
 
@@ -21,6 +22,7 @@ class fairdicegame : public contract {
     tb_bets _bets;
     tb_fund_pool _fund_pool;
     tb_hash _hash;
+    tb_global _global;
 
     uint8_t compute_random_roll(const checksum256& seed) {
         return uint64_hash(seed) % 100 + 1;
@@ -28,25 +30,33 @@ class fairdicegame : public contract {
 
     asset comput_referrer_reward(const st_bet& bet) { return bet.amount / 200; }
 
+    uint64_t next_id() {
+        st_global global = _global.get_or_default(
+            st_global{.current_id = _bets.available_primary_key()});
+        global.current_id += 1;
+        _global.set(global, _self);
+        return global.current_id;
+    }
+
     string referrer_memo(const st_bet& bet) {
         string memo = "bet id:";
-        string id = to_string(bet.id);
+        string id = uint64_string(bet.id);
         memo.append(id);
         memo.append(" player: ");
         string player = name{bet.player}.to_string();
         memo.append(player);
-        memo.append(" referral reward!");
+        memo.append(" referral reward! - dapp.pub/dice/");
         return memo;
     }
 
     string winner_memo(const st_bet& bet) {
         string memo = "bet id:";
-        string id = to_string(bet.id);
+        string id = uint64_string(bet.id);
         memo.append(id);
         memo.append(" player: ");
         string player = name{bet.player}.to_string();
         memo.append(player);
-        memo.append(" winner!");
+        memo.append(" winner! - dapp.pub/dice/");
         print(memo);
         return memo;
     }

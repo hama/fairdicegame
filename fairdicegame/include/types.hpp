@@ -45,8 +45,15 @@ struct st_fund_pool {
     asset locked;
 };
 
-typedef multi_index<N(bets), st_bet> tb_bets;
+// @abi table global i64
+struct st_global {
+    uint64_t current_id;
+};
+
+typedef multi_index<N(bets), st_bet>
+    tb_bets;
 typedef singleton<N(fundpool), st_fund_pool> tb_fund_pool;
+typedef singleton<N(global), st_global> tb_global;
 typedef multi_index<
     N(hash),
     st_hash,
